@@ -1,0 +1,40 @@
+---
+- name: Install and configure Nginx with 2 virtual hosts on Ubuntu
+  hosts: web
+  become: yes
+  tasks:
+
+    - name: Install Nginx
+      apt:
+        name: nginx
+        state: absent
+        update_cache: yes
+
+    - name: Create the configuration for naver.com
+      command: rm -rf /etc/nginx/sites-available/naver.com
+
+    - name: Create the configuration for google.com
+      command: rm -rf /etc/nginx/sites-available/google.com
+
+    - name: Enable naver.com site
+      command: rm -rf /etc/nginx/sites-enabled/naver.com
+
+    - name: Enable google.com site
+      command: rm -rf /etc/nginx/sites-enabled/google.com
+
+    - name: Create directory for naver.com
+      command: rm -rf /var/www/naver/
+
+    - name: Create directory for google.com
+      command: rm -rf /var/www/google/
+
+    - name: Create index.html for naver.com
+      command: rm -rf /var/www/naver/index.html
+
+    - name: Create index.html for google.com
+      command: rm -rf /var/www/google/index.html
+        
+    - name: Delete Nginx
+      apt:
+        name: nginx
+        state: absent

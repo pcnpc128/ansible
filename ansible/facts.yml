@@ -1,0 +1,14 @@
+---
+- name: Run tasks based on OS type
+  hosts: localhost
+  tasks:
+    
+    - name: Install packages for CentOS
+      debug:
+        msg: "This is CentOS"
+      when: ansible_facts['distribution'] == 'CentOS'
+
+    - name: Install packages for Ubuntu
+      debug:
+        msg: "This is Ubuntu"
+      when: ansible_facts['distribution'] == 'Ubuntu’

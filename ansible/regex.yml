@@ -1,0 +1,9 @@
+---
+- name: example regex
+  hosts: localhost
+  tasks:
+
+    - name: equality pattern
+      debug:
+        msg: "pattern is equal"
+      when: "'myfile.txt' | regex_match('.*\\.txt$')"
