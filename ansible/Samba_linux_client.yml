@@ -1,0 +1,44 @@
+---
+- name: Mount in Samba Server
+  hosts: db
+  become: yes
+  vars:
+    samba_server_ip: "192.168.20.1"
+    share_name: "humans"
+    samba_username: "user1"
+    samba_password: "123456"
+
+  tasks:
+    - name: Install Samba package
+      apt:
+        name:
+          - samba
+          - samba-common
+          - smbclient
+        state: present
+        update_cache: yes
+
+    - name: directory be mounted
+      file:
+        path: /dir1
+        state: directory
+        mode: '0777'
+
+    - name: Samba
+      mount:
+        path: /dir1
+        src: "//{{ samba_server_ip }}/{{ share_name }}"
+        fstype: cifs
+        opts: "username={{ samba_username }},password={{ samba_password }},rw,vers=3.0"
+        state: mounted
+        dump: 0
+        passno: 0
+
+    - name: Ensure Samba mounted directory
+      command: mount | grep /dir1
+      register: mount_status
+      changed_when: False
+
+    - name: debug mount status
+      debug:
+        msg: "Mount Status: {{ mount_status.stdout }}"

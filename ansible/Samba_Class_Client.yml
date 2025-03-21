@@ -1,0 +1,41 @@
+---
+- name: 우분투에서 Samba 서버에 마운트
+  hosts: db
+  become: yes
+  vars:
+    samba_server_ip: "192.168.20.1"  # Samba 서버 IP를 정확히 설정
+    share_name: "humans"            # Samba 공유 이름을 설정
+    samba_username: "user1"  # Samba 사용자명
+    samba_password: "qwer_pass"  # Samba 비밀번호
+
+  tasks:
+    - name: cifs-utils 패키지 설치
+      apt:
+        name: cifs-utils
+        state: present
+        update_cache: yes
+
+    - name: 마운트할 디렉토리 생성
+      file:
+        path: /humans
+        state: directory
+        mode: '0755'
+
+    - name: Samba 서버 공유 마운트
+      mount:
+        path: /humans
+        src: "//{{ samba_server_ip }}/{{ share_name }}"
+        fstype: cifs
+        opts: "username={{ samba_username }},password={{ samba_password }},rw,vers=3.0"
+        state: mounted
+        dump: 0
+        passno: 0
+
+    - name: Samba 공유 마운트 정보 확인
+      command: mount | grep /humans
+      register: mount_status
+      changed_when: False
+
+    - name: 마운트 상태 출력
+      debug:
+        msg: "마운트된 Samba 공유: {{ mount_status.stdout }}"
