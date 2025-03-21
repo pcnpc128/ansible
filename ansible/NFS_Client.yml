@@ -1,0 +1,28 @@
+---
+- name: Mount NFS share on Ubuntu
+  hosts: db
+  become: yes
+  tasks:
+
+    - name: Install nfs-common package
+      apt:
+        name: nfs-common
+        state: present
+        update_cache: yes
+
+    - name: Create mount point directory
+      file:
+        path: /dir1
+        state: directory
+        mode: '0755'
+
+    - name: Ensure NFS mount is persistent across reboots
+      mount:
+        path: /dir1
+        src: "192.168.20.1:/sales"
+        fstype: nfs
+        opts: rw,sync
+        state: mounted
+        dump: 0
+        passno: 0
+

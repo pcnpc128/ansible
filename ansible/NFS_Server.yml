@@ -1,0 +1,41 @@
+---
+- name: Install and configure NFS server on Ubuntu
+  hosts: web
+  become: yes
+  tasks:
+
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install NFS server
+      apt:
+        name: nfs-kernel-server
+        state: present
+
+    - name: Create shared directory
+      file:
+        path: /sales
+        state: directory
+        mode: '0777'
+
+    - name: Configure /etc/exports file for NFS shares
+      lineinfile:
+        path: /etc/exports
+        line: "/sales *(rw,sync,no_subtree_check)"
+        create: yes
+
+    - name: Ensure NFS server is running
+      service:
+        name: nfs-kernel-server
+        state: started
+        enabled: yes
+
+    - name: Apply the NFS exports configuration
+      command: exportfs -a
+
+    - name: Restart NFS server service
+      service:
+        name: nfs-kernel-server
+        state: restarted
